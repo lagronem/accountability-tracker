@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danielle's Accountability Tracker</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Libre+Baskerville:ital@0;1&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Libre Baskerville', serif;
+            background: linear-gradient(135deg, #F4E8D0 0%, #E8D4B8 25%, #F0E6D2 50%, #E5D5C3 75%, #F2E9D8 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Decorative elements - cats and Paris motifs */
+        body::before {
+            content: '🐱 🗼 🐈 ☕ 🎨 🐱 🗼 🐈 ☕ 🎨';
+            position: fixed;
+            top: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 2em;
+            opacity: 0.3;
+            z-index: 0;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '🐱 🗼 🐈 ☕ 🎨 🐱 🗼 🐈 ☕ 🎨';
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 2em;
+            opacity: 0.3;
+            z-index: 0;
+            animation: float 6s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #D4145A 0%, #FBB03B 50%, #009B72 100%);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: 5px solid #2C3E50;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '🎨';
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 3em;
+            animation: spin 20s linear infinite;
+        }
+
+        header::after {
+            content: '🐈‍⬛';
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            font-size: 3em;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5em;
+            color: #FFFFFF;
+            text-shadow:
+                3px 3px 0 #2C3E50,
+                5px 5px 10px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            color: #FFF8DC;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-style: italic;
+        }
+
+        .week-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .day-card {
+            background: linear-gradient(135deg,
+                rgba(251, 176, 59, 0.85) 0%,
+                rgba(212, 20, 90, 0.85) 35%,
+                rgba(0, 155, 114, 0.85) 70%,
+                rgba(46, 134, 193, 0.85) 100%);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            border: 4px solid #2C3E50;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .day-card:hover {
+            transform: translateY(-5px) rotate(1deg);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+        }
+
+        .day-card::before {
+            content: attr(data-emoji);
+            position: absolute;
+            top: -15px;
+            right: -10px;
+            font-size: 3em;
+            animation: wiggle 3s ease-in-out infinite;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
+        }
+
+        .day-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 2em;
+            color: #FFFFFF;
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            background: rgba(255, 255, 255, 0.95);
+            margin-bottom: 12px;
+            padding: 15px;
+            border-radius: 10px;
+            border: 3px solid #2C3E50;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+            box-shadow: 5px 5px 0 rgba(0,0,0,0.3);
+        }
+
+        .task-item.completed {
+            background: rgba(152, 251, 152, 0.9);
+            text-decoration: line-through;
+            opacity: 0.8;
+        }
+
+        .task-checkbox {
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            accent-color: #D4145A;
+            flex-shrink: 0;
+        }
+
+        .task-label {
+            cursor: pointer;
+            font-size: 1.1em;
+            color: #2C3E50;
+            flex-grow: 1;
+            font-weight: 500;
+        }
+
+        .progress-section {
+            background: linear-gradient(135deg, #9B59B6 0%, #3498DB 50%, #E74C3C 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            border: 5px solid #2C3E50;
+            text-align: center;
+        }
+
+        .progress-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2em;
+            color: #FFFFFF;
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 30px;
+            border-radius: 12px;
+            border: 3px solid #2C3E50;
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+            min-width: 150px;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #D4145A;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .stat-label {
+            font-size: 1em;
+            color: #2C3E50;
+            margin-top: 5px;
+        }
+
+        .reset-button {
+            margin-top: 25px;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(135deg, #E74C3C 0%, #D4145A 100%);
+            color: white;
+            border: 3px solid #2C3E50;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .reset-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 6px 6px 0 rgba(0,0,0,0.3);
+        }
+
+        .reset-button:active {
+            transform: translateY(0);
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+            }
+
+            .week-container {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-box {
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Danielle's Accountability Tracker</h1>
+            <p class="subtitle">✨ A Parisian Adventure with Cats & Colors ✨</p>
+        </header>
+
+        <div class="week-container" id="weekContainer"></div>
+
+        <div class="progress-section">
+            <h2 class="progress-title">Weekly Progress</h2>
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-value" id="completedTasks">0</div>
+                    <div class="stat-label">Tasks Completed</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="totalTasks">49</div>
+                    <div class="stat-label">Total Tasks</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="completionPercent">0%</div>
+                    <div class="stat-label">Completion Rate</div>
+                </div>
+            </div>
+            <button class="reset-button" onclick="resetWeek()">🔄 Reset Week</button>
+        </div>
+    </div>
+
+    <script>
+        const tasks = [
+            { id: 1, text: '💪 Go to the gym', emoji: '🏋️' },
+            { id: 2, text: '❤️ Do cardio at the gym', emoji: '🏃' },
+            { id: 3, text: '🐕 Dog walk', emoji: '🦮' },
+            { id: 4, text: '💧 Eight glasses of water', emoji: '💦' },
+            { id: 5, text: '🍎 Two pieces of fruit', emoji: '🍊' },
+            { id: 6, text: '🥗 Four servings of veggies', emoji: '🥕' },
+            { id: 7, text: '🍰 Sugar once a day', emoji: '🍬' }
+        ];
+
+        const days = [
+            { name: 'Monday', emoji: '🐱' },
+            { name: 'Tuesday', emoji: '🗼' },
+            { name: 'Wednesday', emoji: '🐈' },
+            { name: 'Thursday', emoji: '☕' },
+            { name: 'Friday', emoji: '🎨' },
+            { name: 'Saturday', emoji: '🐈‍⬛' },
+            { name: 'Sunday', emoji: '🥐' }
+        ];
+
+        function initializeTracker() {
+            const weekContainer = document.getElementById('weekContainer');
+
+            days.forEach((day, dayIndex) => {
+                const dayCard = document.createElement('div');
+                dayCard.className = 'day-card';
+                dayCard.setAttribute('data-emoji', day.emoji);
+
+                const dayName = document.createElement('h2');
+                dayName.className = 'day-name';
+                dayName.textContent = day.name;
+                dayCard.appendChild(dayName);
+
+                const taskList = document.createElement('ul');
+                taskList.className = 'task-list';
+
+                tasks.forEach((task, taskIndex) => {
+                    const taskItem = document.createElement('li');
+                    taskItem.className = 'task-item';
+                    taskItem.id = `task-${dayIndex}-${taskIndex}`;
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'task-checkbox';
+                    checkbox.id = `check-${dayIndex}-${taskIndex}`;
+                    checkbox.addEventListener('change', (e) => handleCheckboxChange(dayIndex, taskIndex, e.target.checked));
+
+                    const label = document.createElement('label');
+                    label.className = 'task-label';
+                    label.htmlFor = `check-${dayIndex}-${taskIndex}`;
+                    label.textContent = task.text;
+
+                    taskItem.appendChild(checkbox);
+                    taskItem.appendChild(label);
+                    taskList.appendChild(taskItem);
+                });
+
+                dayCard.appendChild(taskList);
+                weekContainer.appendChild(dayCard);
+            });
+
+            loadProgress();
+            updateStats();
+        }
+
+        function handleCheckboxChange(dayIndex, taskIndex, isChecked) {
+            const taskItem = document.getElementById(`task-${dayIndex}-${taskIndex}`);
+            if (isChecked) {
+                taskItem.classList.add('completed');
+            } else {
+                taskItem.classList.remove('completed');
+            }
+            saveProgress();
+            updateStats();
+        }
+
+        function saveProgress() {
+            const progress = {};
+            days.forEach((day, dayIndex) => {
+                tasks.forEach((task, taskIndex) => {
+                    const checkbox = document.getElementById(`check-${dayIndex}-${taskIndex}`);
+                    progress[`${dayIndex}-${taskIndex}`] = checkbox.checked;
+                });
+            });
+            localStorage.setItem('danielleTrackerProgress', JSON.stringify(progress));
+        }
+
+        function loadProgress() {
+            const savedProgress = localStorage.getItem('danielleTrackerProgress');
+            if (savedProgress) {
+                const progress = JSON.parse(savedProgress);
+                Object.keys(progress).forEach(key => {
+                    const [dayIndex, taskIndex] = key.split('-');
+                    const checkbox = document.getElementById(`check-${dayIndex}-${taskIndex}`);
+                    const taskItem = document.getElementById(`task-${dayIndex}-${taskIndex}`);
+                    if (checkbox && progress[key]) {
+                        checkbox.checked = true;
+                        taskItem.classList.add('completed');
+                    }
+                });
+            }
+        }
+
+        function updateStats() {
+            let completedCount = 0;
+            const totalCount = days.length * tasks.length;
+
+            days.forEach((day, dayIndex) => {
+                tasks.forEach((task, taskIndex) => {
+                    const checkbox = document.getElementById(`check-${dayIndex}-${taskIndex}`);
+                    if (checkbox && checkbox.checked) {
+                        completedCount++;
+                    }
+                });
+            });
+
+            const percentage = Math.round((completedCount / totalCount) * 100);
+
+            document.getElementById('completedTasks').textContent = completedCount;
+            document.getElementById('totalTasks').textContent = totalCount;
+            document.getElementById('completionPercent').textContent = percentage + '%';
+        }
+
+        function resetWeek() {
+            if (confirm('Are you sure you want to reset all progress for the week?')) {
+                localStorage.removeItem('danielleTrackerProgress');
+                days.forEach((day, dayIndex) => {
+                    tasks.forEach((task, taskIndex) => {
+                        const checkbox = document.getElementById(`check-${dayIndex}-${taskIndex}`);
+                        const taskItem = document.getElementById(`task-${dayIndex}-${taskIndex}`);
+                        if (checkbox) {
+                            checkbox.checked = false;
+                            taskItem.classList.remove('completed');
+                        }
+                    });
+                });
+                updateStats();
+            }
+        }
+
+        // Initialize the tracker when the page loads
+        document.addEventListener('DOMContentLoaded', initializeTracker);
+    </script>
+</body>
+</html>
