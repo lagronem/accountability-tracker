@@ -259,13 +259,14 @@
 
         .notes-section textarea {
             width: 100%;
-            min-height: 80px;
-            padding: 12px;
+            min-height: 150px;
+            padding: 15px;
             border: 3px solid #1a1a1a;
             font-family: 'Courier New', monospace;
-            font-size: 0.9em;
+            font-size: 1em;
             background: #f5f3ed;
             resize: vertical;
+            line-height: 1.6;
         }
 
         .notes-section textarea:focus {
@@ -815,10 +816,14 @@
 
                 saveProgress();
             });
+        });
 
-            // Add click handler to label
-            input.previousElementSibling.addEventListener('click', function() {
-                input.click();
+        // Handle label clicks for file uploads
+        document.querySelectorAll('.image-upload label').forEach(label => {
+            label.addEventListener('click', function(e) {
+                e.preventDefault();
+                const fileInput = this.previousElementSibling;
+                fileInput.click();
             });
         });
 
